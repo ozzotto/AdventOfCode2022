@@ -42,13 +42,13 @@ var path = "" {
 
 let input = readInput(filename: "Input7")!
 var lines = input.components(separatedBy: .newlines)
-// lines.append("$ cd ..") // Example
-lines.append("$ cd ..")
-lines.append("$ cd ..")
 for line in lines {
     // print(message: "\(line)", day: 7)
     if line.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { continue }
+    runCommand(line)
+}
 
+func runCommand(_ line: String) {
     let components = line.components(separatedBy: .whitespaces)
 
     // cd
@@ -58,7 +58,7 @@ for line in lines {
             pathSizes[parent] = (pathSizes[parent] ?? 0) + pathSizes[path]!
             path = parent
             current = parent.components(separatedBy: "_").last!
-            continue
+            return
         }
 
         let name = components.last!
@@ -68,18 +68,18 @@ for line in lines {
             path += ("_" + name)
         }
         current = name
-        continue
+        return
 
     }
 
     // ls
     if line.hasPrefix("$ ls") {
-        continue
+        return
     }
 
     // dir
     if line.hasPrefix("dir") {
-        continue
+        return
     }
 
     // file
@@ -88,14 +88,18 @@ for line in lines {
 }
 
 // MARK: - Part 1
-//var totalSize = 0
-//pathSizes.forEach { name, size in
-//    if size <= 100000 {
-//        print(message: "Path \(name) size is \(size)", day: 7)
-//        totalSize += size
-//    }
-//}
-//print(message: "Total size is \(totalSize)", day: 7)
+var totalSize = 0
+let numberOfDirUpRequired = path.components(separatedBy: "_").count - 1
+for _ in 0..<numberOfDirUpRequired {
+    runCommand("$ cd ..")
+}
+pathSizes.forEach { name, size in
+    if size <= 100000 {
+        print(message: "Path \(name) size is \(size)", day: 7)
+        totalSize += size
+    }
+}
+print(message: "Total size is \(totalSize)", day: 7)
 
 // MARK: - Part 2
 
